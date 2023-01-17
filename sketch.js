@@ -27,8 +27,8 @@ let ppfs;
 let resetb;
 
 function setup() {
-  let w = windowWidth - 48;
-  let h = windowHeight - 48;
+  let w = windowWidth - 20;
+  let h = windowHeight - 70;
 
   let sz = min(w, h);
 
@@ -36,7 +36,9 @@ function setup() {
   resetf();
 
   ppfs = createSlider(1, 2500, 30, 1);
+  ppfs.size(200,40)
   resetb = createButton("reset");
+  resetb.size(100,40)
   resetb.mousePressed(resetf);
 }
 
