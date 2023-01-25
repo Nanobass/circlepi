@@ -132,7 +132,7 @@ function draw() {
   SingleColorText("=", c1, r2, white);
 
   let sTotal = "" + TotalPoints;
-  SingleColorText("Rechteck", c0, r3, white);
+  SingleColorText("Quadrat", c0, r3, white);
   SingleColorText(sTotal, c2, r3, white);
   SingleColorText("=", c1, r3, white);
 }
