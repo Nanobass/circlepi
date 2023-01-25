@@ -76,7 +76,7 @@ function setupUI() {
 }
 
 function setup() {
-  let wWidth = windowWidth - 50;
+  let wWidth = windowWidth;
   let wHeight = windowHeight - 100;
   createCanvas(wWidth, wHeight);
   setupUI();
