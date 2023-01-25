@@ -1,4 +1,9 @@
 let CircleGraphics;
+let HistoryGraphics;
+
+let History = [];
+let HistoryMax;
+let HistoryMin;
 
 let IterationSlider;
 let ResetButton;
@@ -27,13 +32,16 @@ function SimulationReset() {
   Pdiff = 0;
   MatchingDigits = CalculateMatching(PIreal, PIapprox, 1, NumberResolution);
 
+  History = [];
+
   CircleGraphics.background(0);
+  CircleGraphics.noStroke();
 }
 
 function SimulationStep(draw) {
   let x = random(-1, 1);
   let y = random(-1, 1);
-  let i = PointInCircle(x, y);
+  let i = x * x + y * y < 1;
 
   if (i) {
     InsidePoints++;
@@ -42,19 +50,19 @@ function SimulationStep(draw) {
   }
   if (draw) {
     if (i) {
-      CircleGraphics.stroke(0, 0, 255);
+      CircleGraphics.fill(0, 0, 255);
     } else {
-      CircleGraphics.stroke(0, 255, 0);
+      CircleGraphics.fill(0, 255, 0);
     }
-    CircleGraphics.point(
-      x * (CircleGraphics.width / 2) + CircleGraphics.width / 2,
-      y * (CircleGraphics.height / 2) + CircleGraphics.height / 2
+    CircleGraphics.rect(
+      x * (CircleGraphics.width / 2) + CircleGraphics.width / 2 - 2,
+      y * (CircleGraphics.height / 2) + CircleGraphics.height / 2 - 2,
+      4,
+      4
     );
   }
 
   TotalPoints++;
-
-  PIapprox = 4 * (InsidePoints / TotalPoints);
 }
 
 function setupUI() {
@@ -73,6 +81,7 @@ function setupUI() {
   });
 
   CircleGraphics = createGraphics(width, height);
+  HistoryGraphics = createGraphics(width - 2 * 40, 256);
 }
 
 function setup() {
@@ -86,17 +95,48 @@ function setup() {
 function draw() {
   background(0);
 
-  if (SimulationState)
+  if (SimulationState) {
     for (let i = 0; i < IterationSlider.value(); i++) {
-      SimulationStep(i < 500);
+      SimulationStep(i < 250);
     }
+    PIapprox = 4 * (InsidePoints / TotalPoints);
+    Pdiff = PIapprox / PIreal - 1;
+    History.push(-Pdiff);
+    if (History.length > HistoryGraphics.width / 3) {
+      History.shift();
+    }
+  }
+
+  HistoryMax = max(History);
+  HistoryMax = max(HistoryMax, 0);
+  HistoryMin = min(History);
+  HistoryMin = min(HistoryMin, 0);
+
+  HistoryGraphics.background(0);
+  HistoryGraphics.stroke(255);
+  HistoryGraphics.noFill();
+  HistoryGraphics.strokeWeight(5);
+  HistoryGraphics.beginShape();
+  let x = 0;
+  for (let h of History) {
+    let y = map(h, HistoryMin, HistoryMax, 0, HistoryGraphics.height);
+    HistoryGraphics.vertex(x, y);
+    x += HistoryGraphics.width / History.length;
+  }
+  HistoryGraphics.endShape();
+
+  let PIy = map(0, HistoryMin, HistoryMax, 0, HistoryGraphics.height);
+  HistoryGraphics.stroke(255, 0, 0);
+  HistoryGraphics.line(0, PIy, HistoryGraphics.width, PIy);
 
   image(CircleGraphics, 0, 0);
+  tint(255, 255, 255, 127);
+  image(HistoryGraphics, 40, height - 20 - HistoryGraphics.height);
 
   textSize(34);
 
   MatchingDigits = CalculateMatching(PIreal, PIapprox, 1, NumberResolution);
-  
+
   let r = 20;
   let r0 = r + 1 * textSize();
   let r1 = r + 2 * textSize();
@@ -107,10 +147,10 @@ function draw() {
   let c0 = c;
   let c1 = c + 200;
   let c2 = c + 250;
-  
-  let gray = color(0,0,0,127);
+
+  let gray = color(0, 0, 0, 127);
   fill(gray);
-  rect(c-10,r,c+440+10,r3);
+  rect(c - 10, r, c + 440 + 10, r3);
 
   let green = color(0, 255, 0);
   let red = color(255, 0, 0);
@@ -132,13 +172,9 @@ function draw() {
   SingleColorText("=", c1, r2, white);
 
   let sTotal = "" + TotalPoints;
-  SingleColorText("Quadrat", c0, r3, white);
+  SingleColorText("Rechteck", c0, r3, white);
   SingleColorText(sTotal, c2, r3, white);
   SingleColorText("=", c1, r3, white);
-}
-
-function PointInCircle(x, y) {
-  return x * x + y * y < 1;
 }
 
 function CalculateMatching(n1, n2, left, right) {
