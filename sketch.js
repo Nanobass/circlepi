@@ -175,9 +175,6 @@ function draw() {
   SingleColorText("Quadrat", c0, r3, white);
   SingleColorText(sTotal, c2, r3, white);
   SingleColorText("=", c1, r3, white);
-  
-  SingleColorText("DEFINITIV EIN KREIS", 100, 250, white);
-  SingleColorText("DEFINITIV EIN QUADRAT", 100, 280, white);
 }
 
 function CalculateMatching(n1, n2, left, right) {
